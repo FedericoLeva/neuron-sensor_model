@@ -1,0 +1,18 @@
+.subckt K_Memristor_HH in1 in2 params: Ek=20m A=1 u=1
+
+.param gkmax 36m
+.param gk={gkmax*A*u}
+*.param gk 3.668n
+*defining parameters and functions, see Eqs (3)-(S), (7)
+.param ninit 0
+.funct Gn(n) {gk*n**4}
+.funct alphan(v)={100*(100*(v+Ek)+ 1)/( exp(100*(v+Ek)+ 1 )-1)}
+.funct betan(v)={125*exp(12.5*(v+Ek))}
+.funct fn(n,v)={alphan(v)*(1-n)-betan(v)*n}
+* defining memristive port via Eq. (3)
+G in1 in2 value={v(in1,in2)*Gn(v(n))}
+* computing derivative of state variable according to Eq. (4)
+Ed nd 0 value={fn(v(n),v(in1,in2))}
+* computing state variable via integrating its derivative
+E n 0 value={ninit+IDT(v(nd))}
+.ends

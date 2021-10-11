@@ -1,0 +1,29 @@
+              
+Material = "Anysemiconductor2" {
+		insert="./Anysemiconductor2.par"
+		Epsilon{epsilon = 80}
+		Bandgap{Chi0=6.35}
+		eDOSMass{Formula = 2
+		   	Nc300	= 7.8286e19}
+		hDOSMass{Formula = 2
+		   	Nv300	= 7.8286e19} 
+		ConstantMobility:{Exponent= 0 ,	0
+				mutunnel= 0 ,  0
+				mumax	= 0.4e-3 ,0.4e-3}
+}
+
+Material = "Anyinsulator" {
+		insert="./Anyinsulator.par"
+		Epsilon{epsilon = 11.3}
+}
+
+Material = "HfO2" {
+		Epsilon{ epsilon= 15.99}
+}	
+
+Material = "Platinum" {
+		Bandgap{WorkFunction	= 6.35	
+			FermiEnergy	= 11.7}
+}
+
+
