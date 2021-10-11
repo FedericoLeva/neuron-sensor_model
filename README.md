@@ -12,6 +12,9 @@ and a suitable OpAmp model library paths.
 
 - The Sentaurus simulation input decks are supplyed to give examples
 of mixed-mode TCAD-circuit transient simulation analysis.
-Additionally, Sentaurus Mesh
+Sentaurus Mesh inputs for extracellular mushoorm and intracellular 
+nanowire electrodes are given as starting point to run the SDevice 
+inputs for passive-extracellular and active-intracellular 
+mixed-mode TCAD-circuit simulations.
  
 They are intended to help to verify that the model actually works.
