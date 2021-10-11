@@ -1,0 +1,24 @@
+.subckt Na_Memristor_HH in1 in2 params: Ena=130m A=1 u=1
+
+.param gnmax=120m
+.param gna {gnmax*A*u}
+*.param gna 12.216n
+.param minit 0
+.param hinit 0
+.funct Gn(m,h) {gna*m**3*h}
+.funct alpham(v)={2500*(40*(v-Ena)+ 1)/( exp(100*(v-Ena)+ 2.5 )-1)}
+.funct betam(v)={4000*exp((v-Ena)/0.018)}
+.funct alphah(v)={70*exp(50*(v-Ena))}
+.funct betah(v)={1000/(exp(100*(v-Ena)+3)+1)}
+
+.funct fm(m,v)={alpham(v)*(1-m)-betam(v)*m}
+.funct fh(h,v)={alphah(v)*(1-h)-betah(v)*h}
+
+G in1 in2 value={v(in1,in2)*Gn(v(m),v(h))}
+
+Emd md 0 value={fm(v(m),v(in1,in2))}
+Ehd hd 0 value={fh(v(h),v(in1,in2))}
+
+Em m 0 value={minit+IDT(v(md))}
+Eh h 0 value={hinit+IDT(v(hd))}
+.ends

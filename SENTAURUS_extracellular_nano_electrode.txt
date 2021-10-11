@@ -1,0 +1,104 @@
+(sde:clear)
+(sdegeo:set-auto-region-naming OFF)
+(define r_base  (* 0.5 554e-3))
+(define t_ox -150e-3)
+(define t_m -10e-3)
+(define r_cap (* 0.5 2.01))
+(define h_cap -658e-3)
+(define cleft_m 500e-3)
+(define cleft_p -50e-3)
+(define h_stalk (- t_ox 1.134))
+(define r_d 1.73) 
+(define y_d (- (+ h_stalk h_cap) cleft_m))
+
+(sde:setrefprops 0.001 90 0 0)
+(sdegeo:set-default-boolean "BAB")
+(sdegeo:create-rectangle (position 0 0 0.0)  (position (- 0 r_d)  (+ (- (+ h_stalk (* 2 h_cap)) cleft_m) t_m) 0) "Silicon" "dummy_wall")
+(sdegeo:create-rectangle (position 0 h_stalk 0.0)  (position r_d  0 0) "Silicon" "dummy_wall2") 
+(sdegeo:create-elliptical-sheet (position 0 h_stalk  0)  (position r_cap  h_stalk  0)  (/  (- 0 h_cap) r_cap) "Platinum" "cap") ; cap
+(sdegeo:create-elliptical-sheet (position 0 h_stalk  0)  (position (+ r_cap 0.25e-3)  h_stalk  0)  (/  (- 0  (- h_cap 0.25e-3)) (+ 0.25e-3 r_cap)) "HfO2" "cap_passiv") 
+(sdegeo:delete-region  (find-region "dummy_wall")) 
+(sdegeo:delete-region  (find-region "dummy_wall2"))
+(sdegeo:create-rectangle (position 0 0 0.0)  (position r_base  h_stalk 0) "Platinum" "stalk") ; stalk
+(sdegeo:create-rectangle (position 0 0 0.0)  (position r_d t_ox 0) "Si3N4" "oxide") 
+(sdegeo:create-rectangle (position (+ r_base 0.25e-3) 0 0) (position r_base (+ h_stalk 0.25e-3)  0)  "HfO2" "stalk_passiv")
+(sdegeo:create-rectangle (position r_base (+ h_stalk 0.25e-3) 0.0)  (position (+ r_cap 0.25e-3)  h_stalk 0) "HfO2" "cap_passiv2")
+(sdegeo:create-rectangle (position 0 (+ y_d (* 0.5 cleft_m)) 0.0)  (position r_d  (- (+ y_d (* 0.5 cleft_m)) 10e-3) 0) "Anyinsulator" "membrane")
+(sdegeo:create-rectangle (position 0 t_ox 0.0)  (position r_d y_d 0) "Anysemiconductor2" "electrolytes") 
+(sde:assign-material-and-region-names "all") 
+
+; contacts-----------------------------------------------------------------------------------
+
+(sdegeo:define-contact-set "neuron_contact" 4  (color:rgb 1 1 1) "##")
+(sdegeo:set-current-contact-set "neuron_contact")
+(sdegeo:set-contact-edges (list (car (find-edge-id (position 0.1 y_d  0))))  "neuron_contact")
+
+(sdegeo:define-contact-set "nano_contact" 4  (color:rgb 1 1 0) "##")
+(sdegeo:set-current-contact-set "nano_contact")
+(sdegeo:set-contact-edges (list (car (find-edge-id (position (* 0.5 r_base) 0  0))))  "nano_contact")
+
+(sdegeo:insert-vertex  (position r_d (+ t_ox cleft_p) 0.0))
+(sdegeo:define-contact-set "electrolyte_contact" 4  (color:rgb 1 1 0) "##")
+(sdegeo:set-current-contact-set "electrolyte_contact")
+(sdegeo:set-contact-edges (list (car (find-edge-id (position r_d (+ t_ox (* 0.5 cleft_p)) 0))))  "electrolyte_contact")
+(render:rebuild)
+
+(sdegeo:define-contact-set "extra_contact" 4  (color:rgb 1 1 0) "##")
+(sdegeo:set-current-contact-set "extra_contact")
+(sdegeo:set-contact-edges (list (car (find-edge-id (position 0.5e-3  (+ y_d (* 0.5 cleft_m)) 0))))  "extra_contact")
+
+(sdegeo:define-contact-set "intra_contact" 4  (color:rgb 1 1 0) "##")
+(sdegeo:set-current-contact-set "intra_contact")
+(sdegeo:set-contact-edges (list (car (find-edge-id (position 0.5e-3 (- (+ y_d (* 0.5 cleft_m)) 10e-3) 0))))  "intra_contact")
+(render:rebuild)
+
+; mesh strategy--------------------------------------------------------------------------------
+(sdedr:define-refeval-window "RefWin.all" "Rectangle"  (position 0 0 0.0 ) (position r_d y_d 0.0 ))
+(sdedr:define-refinement-size "RefDef.all" 1 1 0.001 0.001 )
+(sdedr:define-refinement-placement "PlaceRF" "RefDef.all" (list "window" "RefWin.all" ) )
+(sdedr:define-refinement-function "RefDef.all" "DopingConcentration" "MaxTransDiff" 1)
+(sdedr:define-refinement-function "RefDef.all" "MaxLenInt" "Platinum" "HfO2" 0.01 1.5 "DoubleSide")
+
+(sdedr:define-refinement-size "RefDef.Ely" 1 1 0.00001 0.00001 )
+(sdedr:define-refinement-material "PlacementRF.Ely" "RefDef.Ely" "Anysemiconductor2")
+(sdedr:define-refinement-function "RefDef.Ely" "MaxLenInt" "Anysemiconductor2" "HfO2" 0.0005 1.5 "DoubleSide") ;dense mesh use: 0.0005
+
+(sdedr:define-refinement-size "RefDef.Memb" 1 1 0.00001 0.00001 )
+(sdedr:define-refinement-material "PlacementRF.Memb" "RefDef.Memb" "Anysemiconductor2")
+(sdedr:define-refinement-function "RefDef.Memb" "MaxLenInt" "Anysemiconductor2" "Anyinsulator" 0.0005 1.5 "DoubleSide") ;dense mesh use: 0.0005
+
+(sdedr:define-refinement-size "RefDef.Silicon" 1 1 0.00001 0.00001 )
+(sdedr:define-refinement-material "PlacementRF.Silicon" "RefDef.Silicon" "Platinum")
+(sdedr:define-refinement-function "RefDef.Silicon" "MaxLenInt" "Platinum" "HfO2" 0.0005 1.5 "DoubleSide") ;dense mesh
+
+
+(sdedr:offset-interface "material" "Platinum" "HfO2" "hlocal" 0.0005 "factor" 1.5)
+
+(sdedr:offset-interface "material" "HfO2" "Platinum" "hlocal" 0.0005 "factor" 1.5)
+
+(sdedr:offset-interface "material" "HfO2" "Oxide" "hlocal" 0.001 "factor" 1.5)
+
+(sdedr:offset-interface "material" "Oxide" "HfO2" "hlocal" 0.001 "factor" 1.5)
+
+(sdedr:offset-interface "material" "HfO2" "Anysemiconductor2" "hlocal" 0.0005 "factor" 1.5)
+
+(sdedr:offset-interface "material" "Anysemiconductor2" "HfO2" "hlocal" 0.0005 "factor" 1.5)
+
+
+(sdedr:offset-interface "material" "Anyinsulator" "Anysemiconductor2" "hlocal" 0.0005 "factor" 1.5)
+
+(sdedr:offset-interface "material" "Anysemiconductor2" "Anyinsulator" "hlocal" 0.0005 "factor" 1.5)
+
+(sdedr:offset-block "material" "Platinum" "maxlevel" 5)
+
+(sdedr:offset-block "material" "Oxide" "maxlevel" 5)
+
+(sdedr:offset-block "material" "HfO2" "maxlevel" 5)
+
+(sdedr:offset-block "material" "Anysemiconductor2" "maxlevel" 6)
+
+(sdedr:offset-block "material" "Anyinsulator" "maxlevel" 6)
+
+(sdeio:save-tdr-bnd (get-body-list) "n@node@_bnd.tdr")
+(sde:set-meshing-command "snmesh -offset")
+(sde:build-mesh "snmesh" " " "n@node@")
