@@ -16,6 +16,6 @@ Sentaurus Mesh inputs for extracellular mushoorm and intracellular
 nanowire electrodes are given as starting point to run the SDevice 
 inputs for passive-extracellular and active-intracellular 
 mixed-mode TCAD-circuit simulations. Additionally, the Sentaurus
-parameter files couples the SDevice inputs to set the intrinsic model paramers.
+parameter file couples the SDevice inputs to set the intrinsic model paramers.
  
 They are intended to help to verify that the model actually works.
