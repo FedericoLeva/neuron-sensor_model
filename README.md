@@ -20,7 +20,7 @@ external voltage source boundary for intracellular, and transmembrane
 current sources for extracellular generate the AP. Additionally, the Sentaurus
 parameter file couples the SDevice inputs to set the intrinsic model paramers.
 
-- The dataset includes the data shown in the figures througout the paper as ASCII files.
+- The datasets include the data shown in the figures througout the paper as ASCII files.
 In addition, a comparison between the analytical tfs with those extracted by AC circuit
 simulation are supplied.
  
