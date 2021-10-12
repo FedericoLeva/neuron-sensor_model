@@ -5,7 +5,7 @@ Each simumlation containts active/passive coupled to intracellular/extracellular
 sensing circuits. The transient analysis include different AP generation
 mechanisms: HH and external voltage source boundary for intracellular,
 and transmembrane current sources for extracellular. Please, include
-inside the "SPICE_circuit_for_transient_analysis.cir" code the:
+inside the "SPICE_circuit_for_transient_analysis.cir" file the:
 Injm.txt, Ijm.txt, Inm.txt, K_memristor_HH.txt, Na_memristor_HH.txt,
 and suitable OpAmp model library paths.
 
