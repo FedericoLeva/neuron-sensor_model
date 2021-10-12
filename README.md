@@ -1,4 +1,4 @@
-# HH_neuron_model
+# neuron-sensor_model
 - The SPICE NETLIST files are supplied to give examples
 of transient and transfer-function circuit simulation analysis. 
 Each simumlation containts active/passive coupled to intracellular/extracellular 
